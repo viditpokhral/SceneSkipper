@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SceneSkip</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 420px;
+      background: #111;
+      color: #f0f0f0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid #222;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      width: 26px;
+      height: 26px;
+      background: #6c5ce7;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .logo-name {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+
+    /* ── Toggle switch ── */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 16px;
+    }
+
+    .toggle-row label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .label-text {
+      color: #ccc;
+    }
+
+    .label-text small {
+      display: block;
+      font-size: 11px;
+      color: #666;
+      margin-top: 1px;
+    }
+
+    .switch {
+      position: relative;
+      width: 38px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #333;
+      border-radius: 11px;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    .slider::before {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      top: 3px;
+      background: #888;
+      border-radius: 50%;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    input:checked+.slider {
+      background: #6c5ce7;
+    }
+
+    input:checked+.slider::before {
+      transform: translateX(16px);
+      background: #fff;
+    }
+
+    /* ── Section headings ── */
+    .section-title {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #555;
+      padding: 10px 16px 4px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: #1e1e1e;
+      margin: 0 16px;
+    }
+
+    /* ── Category toggles ── */
+    .cat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+    }
+
+    .cat-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cat-emoji {
+      font-size: 15px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .cat-name {
+      color: #ddd;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 10px 16px 14px;
+      border-top: 1px solid #1e1e1e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .site-label {
+      font-size: 11px;
+      color: #555;
+    }
+
+    .site-label span {
+      color: #888;
+      display: block;
+    }
+
+    .badge {
+      font-size: 10px;
+      background: #1e1e1e;
+      color: #6c5ce7;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">⏩</div>
+      <span class="logo-name">SceneSkip</span>
+    </div>
+    <span class="badge">MVP</span>
+  </div>
+
+  <!-- Global enabled toggle -->
+  <div class="toggle-row" style="padding: 12px 16px; border-bottom: 1px solid #1e1e1e;">
+    <label>
+      <div class="label-text">
+        SceneSkip enabled
+        <small>Skip scenes on all sites</small>
+      </div>
+      <span class="switch">
+        <input type="checkbox" id="toggle-enabled" />
+        <span class="slider"></span>
+      </span>
+    </label>
+  </div>
+
+  <!-- Skip mode toggle -->
+  <div class="section-title">Skip Mode</div>
+  <div class="toggle-row">
+    <label>
+      <div class="label-text">
+        Manual mode
+        <small>Pause instead of auto-skip</small>
+      </div>
+      <span class="switch">
+        <input type="checkbox" id="toggle-manual" />
+        <span class="slider"></span>
+      </span>
+    </label>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Category toggles -->
+  <div class="section-title">Skip Categories</div>
+
+  <div class="cat-row">
+    <div class="cat-label">
+      <span class="cat-emoji">🔞</span>
+      <span class="cat-name">Nudity</span>
+    </div>
+    <span class="switch">
+      <input type="checkbox" id="cat-nudity" />
+      <span class="slider"></span>
+    </span>
+  </div>
+
+  <div class="cat-row">
+    <div class="cat-label">
+      <span class="cat-emoji">⚔️</span>
+      <span class="cat-name">Violence</span>
+    </div>
+    <span class="switch">
+      <input type="checkbox" id="cat-violence" />
+      <span class="slider"></span>
+    </span>
+  </div>
+
+  <div class="cat-row">
+    <div class="cat-label">
+      <span class="cat-emoji">🩸</span>
+      <span class="cat-name">Gore</span>
+    </div>
+    <span class="switch">
+      <input type="checkbox" id="cat-gore" />
+      <span class="slider"></span>
+    </span>
+  </div>
+
+  <div class="cat-row">
+    <div class="cat-label">
+      <span class="cat-emoji">💊</span>
+      <span class="cat-name">Drug Use</span>
+    </div>
+    <span class="switch">
+      <input type="checkbox" id="cat-drug_use" />
+      <span class="slider"></span>
+    </span>
+  </div>
+
+  <div class="cat-row">
+    <div class="cat-label">
+      <span class="cat-emoji">🤬</span>
+      <span class="cat-name">Profanity</span>
+    </div>
+    <span class="switch">
+      <input type="checkbox" id="cat-profanity" />
+      <span class="slider"></span>
+    </span>
+  </div>
+
+  <!-- Debug / Test section (remove before production) -->
+  <div class="section-title" style="color:#6c5ce7">Debug Tools</div>
+  <div style="padding: 8px 16px 14px; display:flex; flex-direction:column; gap:8px">
+    <div style="font-size:11px; color:#555; margin-bottom:2px">Jump to a timestamp to test skipping:</div>
+    <div style="display:flex; gap:6px; align-items:center">
+      <input type="number" id="debug-time" placeholder="e.g. 28" min="0" style="flex:1; background:#1a1a1a; border:1px solid #333; border-radius:6px; color:#ddd;
+               padding:6px 10px; font-size:12px; outline:none;" />
+      <button id="debug-seek" style="background:#6c5ce7; color:#fff; border:none; border-radius:6px;
+               padding:6px 12px; font-size:12px; cursor:pointer; font-weight:600; white-space:nowrap">
+        Seek →
+      </button>
+    </div>
+    <div id="debug-status" style="font-size:11px; color:#555; min-height:14px"></div>
+  </div>
+
+  <!-- Hunt Tool -->
+  <div class="section-title" style="color:#6c5ce7">Hunt Tool</div>
+  <div style="padding:8px 16px 14px; display:flex; flex-direction:column; gap:8px">
+    <div style="display:flex; gap:6px">
+      <input type="text" id="hunt-query" placeholder="e.g. season, episode, s01e01" style="flex:1; background:#1a1a1a; border:1px solid #333; border-radius:6px;
+             color:#ddd; padding:6px 10px; font-size:12px; outline:none;" />
+      <button id="btn-hunt" style="
+      background:#6c5ce7; color:#fff; border:none; border-radius:6px;
+      padding:6px 12px; font-size:12px; cursor:pointer; font-weight:600;">
+        Hunt
+      </button>
+    </div>
+    <pre id="hunt-output" style="
+    background:#0a0a0a; color:#00ff00; font-size:10px;
+    font-family:monospace; padding:8px; border-radius:6px;
+    max-height:300px; overflow-y:auto; white-space:pre-wrap;
+    margin:0; border:1px solid #222; min-height:20px;
+  "></pre>
+  </div>
+
+  <div class="footer">
+    <div class="site-label">
+      SceneSkip
+      <span id="current-site">v1.0.0</span>
+    </div>
+    <span class="badge" style="background:#1a1a2e; color:#a29bfe;">Phase 1</span>
+  </div>
+
+  <script src="dist/popup.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "sceneskip-extension",
+  "version": "1.0.0",
+  "description": "SceneSkip Chrome Extension — crowdsourced scene skipping for any video",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.90.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
