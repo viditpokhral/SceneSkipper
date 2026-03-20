@@ -62,20 +62,34 @@ function broadcastTitleToFrames() {
 
 async function tryDetectTitleOverride(title: string) {
   if (title === lastCheckedTitle) return;
+  if (lastCheckedTitle && lastCheckedTitle.length > title.length &&
+    lastCheckedTitle.toLowerCase().startsWith(title.toLowerCase())) {
+    return;
+  }
+
   lastCheckedTitle = title;
   const fetched = await fetchTimestamps(title);
   timestamps = fetched;
-  console.log(`[SceneSkip] ${fetched.length} timestamps loaded for: ${title}`);
+
+  const frames = document.querySelectorAll('iframe');
+  frames.forEach((iframe) => {
+    try { iframe.contentWindow?.postMessage({ type: 'SCENESKIP_TITLE', title }, '*'); } catch { /* ignore */ }
+  });
 }
 
 async function tryDetectTitle() {
   const title = detectTitle();
   if (!title || title === lastCheckedTitle) return;
+
+  // Don't overwrite an episode-specific title with a generic one
+  if (lastCheckedTitle && lastCheckedTitle.length > title.length &&
+    lastCheckedTitle.toLowerCase().startsWith(title.toLowerCase())) {
+    return;
+  }
+
   lastCheckedTitle = title;
-  console.log('[SceneSkip] Title detected:', title);
   const fetched = await fetchTimestamps(title);
   timestamps = fetched;
-  console.log(`[SceneSkip] ${fetched.length} timestamps loaded for: ${title}`);
 }
 
 function watchTitleChanges() {
@@ -96,7 +110,7 @@ function watchTitleChanges() {
 
 function detectTitle(): string {
   const checks: Array<() => string | null | undefined> = [
-    // 1. <body data-title> + episode info — only fires if data-title exists
+    // 1. <body data-title> + episode info
     () => {
       const bodyTitle = document.body?.getAttribute('data-title');
       if (!bodyTitle) return null;
@@ -124,6 +138,37 @@ function detectTitle(): string {
       return bodyTitle;
     },
 
+    // 2. Season/episode from href links on the page
+    () => {
+      const links = Array.from(document.querySelectorAll('a[href*="season="][href*="episode="]'));
+      const active = links.find(a =>
+        a.getAttribute('href')?.includes('streaming=true') ||
+        a.classList.contains('active') ||
+        a.classList.contains('current') ||
+        a.getAttribute('aria-current') === 'true' ||
+        a.getAttribute('aria-selected') === 'true' ||
+        (() => {
+          const href = a.getAttribute('href') ?? '';
+          const u = new URL(href, window.location.href);
+          const pageU = new URL(window.location.href);
+          return u.searchParams.get('season') === pageU.searchParams.get('season') &&
+            u.searchParams.get('episode') === pageU.searchParams.get('episode');
+        })()
+      );
+      if (!active) return null;
+      const href = active.getAttribute('href') ?? '';
+      const u = new URL(href, window.location.href);
+      const s = u.searchParams.get('season');
+      const e = u.searchParams.get('episode');
+      if (!s || !e) return null;
+      const h1 = document.querySelector('h1')?.textContent?.trim();
+      const og = document.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.content;
+      const base = h1 || (og ? cleanTitle(og) : null);
+      if (base) return `${cleanTitle(base)} S${s}E${e}`;
+      return null;
+    },
+
+    // 3. aria-label with Season/Episode
     () => {
       const el = document.querySelector('[aria-label*="Season"][aria-label*="Episode"]');
       if (!el) return null;
@@ -131,32 +176,32 @@ function detectTitle(): string {
       const m = label.match(/^(.+?),\s*Season\s*(\d+),\s*Episode\s*(\d+)/i);
       if (!m) return null;
       const title = m[1].trim();
-      if (title.length < 3 || /player/i.test(title)) return null; // ← guard
+      if (title.length < 3 || /player/i.test(title)) return null;
       return `${title} S${m[2]}E${m[3]}`;
     },
 
-    // 2. Already grabbed by XHR/fetch interceptor
+    // 4. XHR/fetch interceptor
     () => (window as any).__sceneskip_title,
 
-    // 3. JW Player DOM elements
+    // 5. JW Player DOM elements
     () => document.querySelector('.jw-title-primary')?.textContent?.trim(),
     () => document.querySelector('[class*="jw-title"]')?.textContent?.trim(),
     () => document.querySelector('.player-bottom-title')?.textContent?.trim(),
 
-    // 4. Plain h1 — many simple sites just use this
+    // 6. Plain h1
     () => document.querySelector('h1')?.textContent?.trim(),
 
-    // 5. div.title / h1.title pattern
+    // 7. div.title / h1.title pattern
     () => document.querySelector('div.title, h1.title, span.title')?.textContent?.trim(),
 
-    // 6. YouTube h1
+    // 8. YouTube h1
     () => window.location.hostname.includes('youtube.com')
       ? (document.querySelector('h1.ytd-watch-metadata yt-formatted-string') ||
         document.querySelector('h1.ytd-video-primary-info-renderer yt-formatted-string') ||
         document.querySelector('#title h1 yt-formatted-string'))?.textContent?.trim()
       : null,
 
-    // 7. Hotstar JSON-LD — clean title + episode without "Watch" prefix
+    // 9. Hotstar JSON-LD
     () => {
       for (const tag of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
         try {
@@ -175,7 +220,7 @@ function detectTitle(): string {
       }
     },
 
-    // 8. General JSON-LD
+    // 10. General JSON-LD
     () => {
       for (const tag of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
         try {
@@ -189,20 +234,20 @@ function detectTitle(): string {
       }
     },
 
-    // 9. OpenGraph / Twitter meta
+    // 11. OpenGraph / Twitter meta
     () => document.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.content,
     () => document.querySelector<HTMLMetaElement>('meta[name="twitter:title"]')?.content,
 
-    // 10. Common title elements
+    // 12. Common title elements
     () => document.querySelector('.movie-title, .film-title, .video-title, .entry-title')?.textContent?.trim(),
 
-    // 11. <title> tag
+    // 13. <title> tag
     () => document.title ? cleanTitle(document.title) : null,
 
-    // 12. URL path e.g. /movie/dune-part-two-2024
+    // 14. URL path e.g. /movie/dune-part-two-2024
     () => extractTitleFromUrl(window.location.pathname),
 
-    // 13. Inline scripts containing title
+    // 15. Inline scripts containing title
     () => {
       for (const tag of Array.from(document.querySelectorAll('script:not([src])'))) {
         const m = tag.textContent?.match(/"title"\s*:\s*"([^"]{2,80})"/);
@@ -212,13 +257,13 @@ function detectTitle(): string {
       }
     },
 
-    // 14. ?t=MovieTitle in page HTML
+    // 16. ?t=MovieTitle in page HTML
     () => {
       const m = document.documentElement.innerHTML.match(/[?&]t=([A-Za-z][^&"'\s]{1,60})/);
       return m?.[1] ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : null;
     },
 
-    // 15. data-* attributes
+    // 17. data-* attributes
     () => document.querySelector('[data-movie]')?.getAttribute('data-movie'),
     () => document.querySelector('[data-film]')?.getAttribute('data-film'),
     () => document.querySelector('[data-name]')?.getAttribute('data-name'),
@@ -231,10 +276,7 @@ function detectTitle(): string {
       const result = check();
       if (result && result.trim().length > 1) {
         const cleaned = cleanTitle(result.trim());
-        if (cleaned.length > 1) {
-          console.log('[SceneSkip] detectTitle winner:', cleaned);
-          return cleaned;
-        }
+        if (cleaned.length > 1) return cleaned;
       }
     } catch { /* keep trying */ }
   }
@@ -245,6 +287,7 @@ function detectTitle(): string {
 function cleanTitle(raw: string): string {
   return raw
     .replace(/^Watch\s+/i, '')
+    .replace(/\s*\(\d{4}(-\d{4})?\)\s*/g, ' ')
     .replace(/\s*[-|–—]\s*(Netflix|YouTube|Prime Video|Disney\+|HBO|Hulu|Hotstar|JioHotstar|Peacock|Paramount\+|Apple TV\+|Watch Online|Stream Free|Full Movie|HD|Free|Download|123movies|Putlocker|Fmovies|Gomovies|Sflix|Soap2day).*$/i, '')
     .replace(/\s+\|\s+.*$/, '')
     .replace(/\s*::\s*.*$/, '')
@@ -311,7 +354,6 @@ function observeVideos() {
 function attachToVideo(video: HTMLVideoElement) {
   if ((video as any)._ssAttached) return;
   (video as any)._ssAttached = true;
-  console.log('[SceneSkip] Attached to <video>');
   createSkipOverlay();
   if (pollInterval !== null) clearInterval(pollInterval);
   pollInterval = window.setInterval(() => checkAndSkip(video), 500);
@@ -336,7 +378,6 @@ function checkAndSkip(video: HTMLVideoElement) {
         video.currentTime = ts.endTime;
         showOverlay(ts, 'skipped');
       }
-      console.log(`[SceneSkip] ${settings.manualMode ? 'PAUSED' : 'SKIPPED'} ${ts.category} at ${current.toFixed(1)}s`);
       break;
     }
   }
@@ -385,8 +426,6 @@ chrome.runtime.onMessage.addListener((message) => {
 interceptPlaylistRequests();
 
 async function init() {
-  console.log('[SceneSkip] Running on:', window.location.hostname, '| inFrame:', window !== window.top);
-
   settings = await getSettings();
   if (!isEnabledForSite()) return;
 
@@ -410,7 +449,6 @@ async function init() {
     setTimeout(broadcastTitleToFrames, 2000);
     setTimeout(broadcastTitleToFrames, 5000);
 
-    // Listen for episode info sent back from iframes
     window.addEventListener('message', (event) => {
       if (event.data?.type === 'SCENESKIP_EPISODE') {
         const { season, episode } = event.data;
@@ -425,7 +463,6 @@ async function init() {
   }
 
   if (window !== window.top) {
-    // Listen for title broadcast from parent
     window.addEventListener('message', (event) => {
       if (event.data?.type === 'SCENESKIP_TITLE' && event.data.title) {
         lastCheckedTitle = '';
@@ -433,16 +470,11 @@ async function init() {
       }
     });
 
-    // Send episode info back to parent if found in this iframe
     const sendEpisodeToParent = () => {
       for (const p of Array.from(document.querySelectorAll('p'))) {
         const m = p.textContent?.trim().match(/Season\s*(\d+)\s*[·•]\s*Episode\s*(\d+)/i);
         if (m) {
-          window.parent.postMessage({
-            type: 'SCENESKIP_EPISODE',
-            season: m[1],
-            episode: m[2],
-          }, '*');
+          window.parent.postMessage({ type: 'SCENESKIP_EPISODE', season: m[1], episode: m[2] }, '*');
           return;
         }
       }
