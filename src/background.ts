@@ -6,6 +6,16 @@ import { Message, UserSettings, DEFAULT_SETTINGS, SkipTimestamp } from './types'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const MOCK_TIMESTAMPS: Array<{ keyword: string; timestamps: SkipTimestamp[] }> = [
+
+  {
+    keyword: "raid",   // must come BEFORE "dune part one" and "dune"
+    timestamps: [
+      { id: "raid-1", startTime: 15, endTime: 1000, category: "violence", title: "Raid" },
+      { id: "raid-1", startTime: 1005, endTime: 2000, category: "violence", title: "Raid" },
+      { id: "raid-1", startTime: 2005, endTime: 3000, category: "violence", title: "Raid" },
+    ],
+  },
+
   {
     keyword: "dune part two",   // must come BEFORE "dune part one" and "dune"
     timestamps: [
@@ -13,9 +23,9 @@ const MOCK_TIMESTAMPS: Array<{ keyword: string; timestamps: SkipTimestamp[] }> =
     ],
   },
   {
-    keyword: "dune part one",
+    keyword: "devon ke dev mahadev s1e3",
     timestamps: [
-      { id: "dune1-1", startTime: 30, endTime: 38, category: "violence", title: "Dune Part One" },
+      { id: "dkdm-s1e3-1", startTime: 10, endTime: 300, category: "violence", title: "Devon Ke Dev Mahadev S1E3" },
     ],
   },
   {
@@ -40,7 +50,32 @@ const MOCK_TIMESTAMPS: Array<{ keyword: string; timestamps: SkipTimestamp[] }> =
   {
     keyword: "breaking bad s5e1",
     timestamps: [
-      { id: "bb-s5e1-1", startTime: 120, endTime: 130, category: "violence", title: "Breaking Bad S5E1" },
+      { id: "bb-s5e1-1", startTime: 20, endTime: 130, category: "violence", title: "Breaking Bad S5E1" },
+    ]
+  },
+  // ── Dhoom — specific before generic ──────────────────────────────────────
+  {
+    keyword: "dhoom 3",
+    timestamps: [
+      { id: "dhoom3-1", startTime: 80, endTime: 496, category: "violence", title: "Dhoom 3" },
+      { id: "dhoom3-2", startTime: 1080, endTime: 1095, category: "violence", title: "Dhoom 3" },
+      { id: "dhoom3-3", startTime: 1800, endTime: 1815, category: "gore", title: "Dhoom 3" },
+    ]
+  },
+  {
+    keyword: "dhoom 2",
+    timestamps: [
+      { id: "dhoom2-1", startTime: 20, endTime: 438, category: "violence", title: "Dhoom 2" },
+      { id: "dhoom2-2", startTime: 900, endTime: 918, category: "nudity", title: "Dhoom 2" },
+      { id: "dhoom2-3", startTime: 1500, endTime: 1520, category: "violence", title: "Dhoom 2" },
+    ]
+  },
+  {
+    keyword: "dhoom",
+    timestamps: [
+      { id: "dhoom1-1", startTime: 30, endTime: 318, category: "violence", title: "Dhoom" },
+      { id: "dhoom1-2", startTime: 720, endTime: 735, category: "violence", title: "Dhoom" },
+      { id: "dhoom1-3", startTime: 1200, endTime: 1215, category: "nudity", title: "Dhoom" },
     ]
   },
 ];
