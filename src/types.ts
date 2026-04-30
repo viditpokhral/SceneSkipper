@@ -1,46 +1,63 @@
-// ─── Core Data Types ───────────────────────────────────────────────────────────
+// ─── Categories ───────────────────────────────────────────────────────────────
 
-export type SkipCategory = 'nudity' | 'violence' | 'gore' | 'drug_use' | 'profanity';
+export const CATEGORIES = {
+  SEX_NUDITY: 'sex_nudity',
+  VIOLENCE_GORE: 'violence_gore',
+  FILLER: 'filler',
+  OTHERS: 'others',
+} as const;
 
-export interface SkipTimestamp {
+export type Category = typeof CATEGORIES[keyof typeof CATEGORIES];
+
+// ─── Labels (UI only) ─────────────────────────────────────────────────────────
+
+export const CATEGORY_LABELS: Record<Category, string> = {
+  [CATEGORIES.SEX_NUDITY]: 'Sex & Nudity',
+  [CATEGORIES.VIOLENCE_GORE]: 'Violence & Gore',
+  [CATEGORIES.FILLER]: 'Filler Content',
+  [CATEGORIES.OTHERS]: 'Others',
+};
+
+// ─── Timestamp (API data) ─────────────────────────────────────────────────────
+
+export interface Timestamp {
   id: string;
-  startTime: number;  // seconds from video start
-  endTime: number;    // seconds from video start
-  category: SkipCategory;
-  title: string;      // movie/show title this belongs to
+  start_time: number;
+  end_time: number;
+  category: Category;
+  note?: string | null;
 }
 
-// ─── User Settings ─────────────────────────────────────────────────────────────
+/** Alias — kept so existing mock data imports don't break */
+export type SkipTimestamp = Timestamp;
+
+// ─── User Settings ────────────────────────────────────────────────────────────
 
 export interface UserSettings {
-  enabled: boolean;         // global on/off toggle
-  manualMode: boolean;      // true = pause video, false = skip ahead
-  categories: Record<SkipCategory, boolean>;
-  disabledSites: string[];  // hostnames where SceneSkip is turned off
+  enabled: boolean;
+  manualMode: boolean;
+  categories: Record<Category, boolean>;
+  disabledSites: string[];
 }
+
+// ─── Default Settings ─────────────────────────────────────────────────────────
 
 export const DEFAULT_SETTINGS: UserSettings = {
   enabled: true,
   manualMode: false,
   categories: {
-    nudity: true,
-    violence: true,
-    gore: true,
-    drug_use: false,
-    profanity: false,
+    [CATEGORIES.SEX_NUDITY]: true,
+    [CATEGORIES.VIOLENCE_GORE]: true,
+    [CATEGORIES.FILLER]: false,
+    [CATEGORIES.OTHERS]: false,
   },
   disabledSites: [],
 };
 
-// ─── Message Types (content ↔ background ↔ popup) ─────────────────────────────
+// ─── Message types (background ↔ content ↔ popup) ────────────────────────────
 
-export type MessageType =
-  | 'FETCH_TIMESTAMPS'
-  | 'GET_SETTINGS'
-  | 'UPDATE_SETTINGS'
-  | 'SETTINGS_UPDATED';
-
-export interface Message {
-  type: MessageType;
-  payload?: any;
-}
+export type Message =
+  | { type: 'GET_SETTINGS' }
+  | { type: 'UPDATE_SETTINGS'; payload: UserSettings }
+  | { type: 'SETTINGS_UPDATED'; payload: UserSettings }
+  | { type: 'FETCH_TIMESTAMPS'; payload: { title: string } };

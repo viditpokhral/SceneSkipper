@@ -6,6 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SceneSkip</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+
+    :root {
+      --black: #000;
+      --white: #fff;
+      --accent: #E53935;
+      --accent-2: #ffd60a;
+      --border: 3px solid #000;
+      --shadow: 4px 4px 0 #000;
+      --radius: 6px;
+      --radius-pill: 50px;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -13,329 +26,416 @@
     }
 
     body {
-      width: 420px;
-      background: #111;
-      color: #f0f0f0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 13px;
+      width: 360px;
+      background: var(--white);
+      color: var(--black);
+      font-family: 'Space Mono', monospace;
+      border: var(--border);
+      overflow: hidden;
     }
 
-    /* ── Header ── */
+    /* ── HEADER ── */
     .header {
+      background: var(--accent);
+      padding: 14px 16px;
+      border-bottom: var(--border);
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px 12px;
-      border-bottom: 1px solid #222;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .logo-icon {
-      width: 26px;
-      height: 26px;
-      background: #6c5ce7;
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
       justify-content: center;
-      font-size: 14px;
+      align-items: center;
+      position: relative;
     }
 
     .logo-name {
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: -0.3px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 34px;
+      letter-spacing: 1.5px;
+      color: var(--white);
+      line-height: 1;
     }
 
-    /* ── Toggle switch ── */
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 11px 16px;
-    }
-
-    .toggle-row label {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      cursor: pointer;
-      width: 100%;
-      justify-content: space-between;
-    }
-
-    .label-text {
-      color: #ccc;
-    }
-
-    .label-text small {
-      display: block;
+    .badge-mvp {
+      position: absolute;
+      right: 16px;
+      background: var(--black);
+      color: var(--white);
+      padding: 2px 6px;
       font-size: 11px;
-      color: #666;
-      margin-top: 1px;
+      font-weight: 700;
+      border-radius: 4px;
+    }
+
+    /* ── SECTION TITLES ── */
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 1px;
+      color: var(--black);
+      padding: 12px 16px 4px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--white);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin: 0 16px 12px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-text .title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      line-height: 1;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-text .sub {
+      font-size: 9px;
+      color: #555;
+    }
+
+    /* ── SITE TOGGLE CARD ── */
+    .site-card {
+      background: var(--white);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin: 0 16px 12px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .site-card .site-info .title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .site-card .site-info .sub {
+      font-size: 9px;
+      color: #555;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #btn-site-toggle {
+      flex-shrink: 0;
+      background: var(--black);
+      color: var(--white);
+      border: var(--border);
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 #555;
+      white-space: nowrap;
+    }
+
+    #btn-site-toggle:active {
+      transform: translate(2px, 2px);
+      box-shadow: none;
+    }
+
+    #btn-site-toggle.enabled {
+      background: var(--black);
+    }
+
+    #btn-site-toggle.disabled {
+      background: var(--accent);
+    }
+
+    /* ── TOGGLE SWITCH ── */
+    .switch-label {
+      cursor: pointer;
+      display: flex;
+    }
+
+    .switch-label input {
+      display: none;
     }
 
     .switch {
       position: relative;
-      width: 38px;
-      height: 22px;
-      flex-shrink: 0;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      inset: 0;
-      background: #333;
-      border-radius: 11px;
+      width: 52px;
+      height: 28px;
+      border: var(--border);
+      border-radius: var(--radius-pill);
+      background: var(--white);
       transition: background 0.2s;
-      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
     }
 
-    .slider::before {
+    .switch::before {
       content: '';
       position: absolute;
-      width: 16px;
-      height: 16px;
-      left: 3px;
-      top: 3px;
-      background: #888;
+      width: 14px;
+      height: 14px;
+      background: var(--white);
+      border: var(--border);
       border-radius: 50%;
-      transition: transform 0.2s, background 0.2s;
+      top: 1px;
+      left: 1px;
+      transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    input:checked+.slider {
-      background: #6c5ce7;
+    .switch-label input:checked+.switch {
+      background: var(--accent);
     }
 
-    input:checked+.slider::before {
-      transform: translateX(16px);
-      background: #fff;
+    .switch-label input:checked+.switch::before {
+      transform: translateX(24px);
     }
 
-    /* ── Section headings ── */
-    .section-title {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #555;
-      padding: 10px 16px 4px;
+    /* ── HUNT / DEBUG CARDS ── */
+    .hunt-card {
+      background: var(--accent);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin: 16px;
+      padding: 12px;
     }
 
-    /* ── Divider ── */
-    .divider {
-      height: 1px;
-      background: #1e1e1e;
-      margin: 0 16px;
+    .hunt-title {
+      font-family: 'Bebas Neue', sans-serif;
+      color: var(--white);
+      font-size: 22px;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
     }
 
-    /* ── Category toggles ── */
-    .cat-row {
+    .hunt-flex {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 16px;
-    }
-
-    .cat-label {
-      display: flex;
-      align-items: center;
       gap: 8px;
+      margin-bottom: 8px;
     }
 
-    .cat-emoji {
-      font-size: 15px;
-      width: 20px;
-      text-align: center;
-    }
-
-    .cat-name {
-      color: #ddd;
-    }
-
-    /* ── Footer ── */
-    .footer {
-      padding: 10px 16px 14px;
-      border-top: 1px solid #1e1e1e;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .site-label {
-      font-size: 11px;
-      color: #555;
-    }
-
-    .site-label span {
-      color: #888;
-      display: block;
-    }
-
-    .badge {
-      font-size: 10px;
-      background: #1e1e1e;
-      color: #6c5ce7;
+    input[type="text"],
+    input[type="number"] {
+      flex: 1;
+      border: var(--border);
       border-radius: 4px;
-      padding: 2px 7px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
+      padding: 6px 10px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      outline: none;
+      color: #333;
+    }
+
+    button#btn-hunt,
+    button#btn-diagnose {
+      background: var(--accent-2);
+      border: var(--border);
+      border-radius: 4px;
+      padding: 0 14px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--black);
+      white-space: nowrap;
+    }
+
+    button#btn-hunt:active,
+    button#btn-diagnose:active {
+      transform: translate(2px, 2px);
+      box-shadow: none;
+    }
+
+    #hunt-output,
+    #diagnose-output {
+      background: var(--black);
+      color: #4ade80;
+      border: var(--border);
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 10px;
+      min-height: 32px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    #diagnose-output .row-ok {
+      color: #4ade80;
+    }
+
+    #diagnose-output .row-miss {
+      color: #f87171;
+    }
+
+    #diagnose-output .row-label {
+      color: #ffd60a;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 6px;
+      height: 10px;
+      background: #4ade80;
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      padding: 4px 16px 12px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--black);
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Header -->
   <div class="header">
-    <div class="logo">
-      <div class="logo-icon">⏩</div>
-      <span class="logo-name">SceneSkip</span>
-    </div>
-    <span class="badge">MVP</span>
+    <span class="logo-name">SCENESKIP</span>
+    <span class="badge-mvp">MVP</span>
   </div>
 
-  <!-- Global enabled toggle -->
-  <div class="toggle-row" style="padding: 12px 16px; border-bottom: 1px solid #1e1e1e;">
-    <label>
-      <div class="label-text">
-        SceneSkip enabled
-        <small>Skip scenes on all sites</small>
-      </div>
-      <span class="switch">
-        <input type="checkbox" id="toggle-enabled" />
-        <span class="slider"></span>
-      </span>
+  <!-- Master enable/disable -->
+  <div style="margin-top: 16px;" class="card">
+    <div class="card-text">
+      <div class="title">SYSTEM ENABLED</div>
+      <div class="sub">Master kill-switch for all sites</div>
+    </div>
+    <label class="switch-label">
+      <input type="checkbox" id="toggle-enabled" checked />
+      <div class="switch"></div>
     </label>
   </div>
 
-  <!-- Skip mode toggle -->
-  <div class="section-title">Skip Mode</div>
-  <div class="toggle-row">
-    <label>
-      <div class="label-text">
-        Manual mode
-        <small>Pause instead of auto-skip</small>
-      </div>
-      <span class="switch">
-        <input type="checkbox" id="toggle-manual" />
-        <span class="slider"></span>
-      </span>
+  <!-- Per-site toggle — FIX: this card was missing from popup.html entirely,
+       causing btn-site-toggle and current-site to silently fail in popup.ts -->
+  <div class="section-title">THIS SITE</div>
+  <div class="site-card">
+    <div class="site-info">
+      <div class="title">SITE OVERRIDE</div>
+      <div class="sub" id="current-site">detecting...</div>
+    </div>
+    <button id="btn-site-toggle" class="enabled">Disable here</button>
+  </div>
+
+  <div class="section-title">SKIP MODE</div>
+  <div class="card">
+    <div class="card-text">
+      <div class="title">MANUAL OVERRIDE</div>
+      <div class="sub">Pause video instead of auto-skipping</div>
+    </div>
+    <label class="switch-label">
+      <input type="checkbox" id="toggle-manual" />
+      <div class="switch"></div>
     </label>
   </div>
 
-  <div class="divider"></div>
+  <div class="section-title">FILTER CATEGORIES</div>
 
-  <!-- Category toggles -->
-  <div class="section-title">Skip Categories</div>
-
-  <div class="cat-row">
-    <div class="cat-label">
-      <span class="cat-emoji">🔞</span>
-      <span class="cat-name">Nudity</span>
+  <div class="card">
+    <div class="card-text">
+      <div class="title">🔞 SEX & NUDITY</div>
+      <div class="sub">Explicit scenes</div>
     </div>
-    <span class="switch">
-      <input type="checkbox" id="cat-nudity" />
-      <span class="slider"></span>
-    </span>
+    <label class="switch-label">
+      <input type="checkbox" id="cat-sex_nudity" checked />
+      <div class="switch"></div>
+    </label>
   </div>
 
-  <div class="cat-row">
-    <div class="cat-label">
-      <span class="cat-emoji">⚔️</span>
-      <span class="cat-name">Violence</span>
+  <div class="card">
+    <div class="card-text">
+      <div class="title">⚔️ VIOLENCE & GORE</div>
+      <div class="sub">Violent or graphic content</div>
     </div>
-    <span class="switch">
-      <input type="checkbox" id="cat-violence" />
-      <span class="slider"></span>
-    </span>
+    <label class="switch-label">
+      <input type="checkbox" id="cat-violence_gore" checked />
+      <div class="switch"></div>
+    </label>
   </div>
 
-  <div class="cat-row">
-    <div class="cat-label">
-      <span class="cat-emoji">🩸</span>
-      <span class="cat-name">Gore</span>
+  <div class="card">
+    <div class="card-text">
+      <div class="title">⏭️ FILLER</div>
+      <div class="sub">Non-essential / skippable scenes</div>
     </div>
-    <span class="switch">
-      <input type="checkbox" id="cat-gore" />
-      <span class="slider"></span>
-    </span>
+    <label class="switch-label">
+      <input type="checkbox" id="cat-filler" />
+      <div class="switch"></div>
+    </label>
   </div>
 
-  <div class="cat-row">
-    <div class="cat-label">
-      <span class="cat-emoji">💊</span>
-      <span class="cat-name">Drug Use</span>
+  <div class="card">
+    <div class="card-text">
+      <div class="title">⚠️ OTHERS</div>
+      <div class="sub">Catch-all content</div>
     </div>
-    <span class="switch">
-      <input type="checkbox" id="cat-drug_use" />
-      <span class="slider"></span>
-    </span>
+    <label class="switch-label">
+      <input type="checkbox" id="cat-others" />
+      <div class="switch"></div>
+    </label>
   </div>
 
-  <div class="cat-row">
-    <div class="cat-label">
-      <span class="cat-emoji">🤬</span>
-      <span class="cat-name">Profanity</span>
+  <!-- Debug seek -->
+  <div class="hunt-card" style="background: var(--accent-2); margin-bottom: 0;">
+    <div class="hunt-title" style="color: var(--black);">DEBUG SEEK</div>
+    <div class="hunt-flex">
+      <input type="number" id="debug-time" placeholder="SECONDS (e.g. 120)" min="0"
+        style="background: var(--white); color: var(--black);" />
+      <button id="debug-seek" style="background: var(--white);">JUMP</button>
     </div>
-    <span class="switch">
-      <input type="checkbox" id="cat-profanity" />
-      <span class="slider"></span>
-    </span>
+    <div id="debug-status" style="color: var(--black); font-size: 10px; font-weight: bold; min-height: 15px;">
+      WAITING FOR INPUT...
+    </div>
   </div>
 
-  <!-- Debug / Test section (remove before production) -->
-  <div class="section-title" style="color:#6c5ce7">Debug Tools</div>
-  <div style="padding: 8px 16px 14px; display:flex; flex-direction:column; gap:8px">
-    <div style="font-size:11px; color:#555; margin-bottom:2px">Jump to a timestamp to test skipping:</div>
-    <div style="display:flex; gap:6px; align-items:center">
-      <input type="number" id="debug-time" placeholder="e.g. 28" min="0" style="flex:1; background:#1a1a1a; border:1px solid #333; border-radius:6px; color:#ddd;
-               padding:6px 10px; font-size:12px; outline:none;" />
-      <button id="debug-seek" style="background:#6c5ce7; color:#fff; border:none; border-radius:6px;
-               padding:6px 12px; font-size:12px; cursor:pointer; font-weight:600; white-space:nowrap">
-        Seek →
+  <!-- Diagnose -->
+  <div class="hunt-card" style="background: #1a1a2e; margin-bottom: 0;">
+    <div class="hunt-title" style="color: #a29bfe;">DIAGNOSE</div>
+    <div class="hunt-flex" style="margin-bottom: 8px;">
+      <button id="btn-diagnose" style="width:100%; font-size:16px; padding: 6px 0;">
+        SCAN THIS PAGE
       </button>
     </div>
-    <div id="debug-status" style="font-size:11px; color:#555; min-height:14px"></div>
+    <div id="diagnose-output">Click SCAN THIS PAGE while watching a show...<span class="cursor"></span></div>
   </div>
 
-  <!-- Hunt Tool -->
-  <div class="section-title" style="color:#6c5ce7">Hunt Tool</div>
-  <div style="padding:8px 16px 14px; display:flex; flex-direction:column; gap:8px">
-    <div style="display:flex; gap:6px">
-      <input type="text" id="hunt-query" placeholder="e.g. season, episode, s01e01" style="flex:1; background:#1a1a1a; border:1px solid #333; border-radius:6px;
-             color:#ddd; padding:6px 10px; font-size:12px; outline:none;" />
-      <button id="btn-hunt" style="
-      background:#6c5ce7; color:#fff; border:none; border-radius:6px;
-      padding:6px 12px; font-size:12px; cursor:pointer; font-weight:600;">
-        Hunt
-      </button>
+  <!-- Hunt tool -->
+  <div class="hunt-card">
+    <div class="hunt-title">HUNT TOOL</div>
+    <div class="hunt-flex">
+      <input type="text" id="hunt-query" placeholder="S01E01..." />
+      <button id="btn-hunt">HUNT</button>
     </div>
-    <pre id="hunt-output" style="
-    background:#0a0a0a; color:#00ff00; font-size:10px;
-    font-family:monospace; padding:8px; border-radius:6px;
-    max-height:300px; overflow-y:auto; white-space:pre-wrap;
-    margin:0; border:1px solid #222; min-height:20px;
-  "></pre>
+    <div id="hunt-output">READY_FOR_INPUT...<span class="cursor"></span></div>
   </div>
 
   <div class="footer">
-    <div class="site-label">
-      SceneSkip
-      <span id="current-site">v1.0.0</span>
-    </div>
-    <span class="badge" style="background:#1a1a2e; color:#a29bfe;">Phase 1</span>
+    <div>SCENESKIP // V1.0.0</div>
+    <div>PHASE 1</div>
   </div>
 
   <script src="dist/popup.js"></script>

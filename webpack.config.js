@@ -1,12 +1,20 @@
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 
-module.exports = {
-  // Three separate entry points — Chrome extensions need separate bundles
+/** @type {import('webpack').Configuration} */
+const config = {
   entry: {
-    content:    './src/content.ts',
     background: './src/background.ts',
-    popup:      './src/popup.ts',
+    content: './src/content.ts',
+    popup: './src/popup.ts',
   },
+
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+    clean: true,
+  },
+
   module: {
     rules: [
       {
@@ -16,12 +24,27 @@ module.exports = {
       },
     ],
   },
+
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.ts', '.tsx', '.js'],
   },
-  output: {
-    filename: '[name].js',       // → dist/content.js, dist/background.js, dist/popup.js
-    path: path.resolve(__dirname, 'dist'),
-    clean: true,
+
+  devtool: process.env.NODE_ENV === 'production' ? false : 'inline-source-map',
+
+  target: 'web',
+
+  optimization: {
+    splitChunks: false,
+    runtimeChunk: false,
   },
+
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: 'src/netflix-bridge.js', to: 'netflix-bridge.js' },
+      ],
+    }),
+  ],
 };
+
+module.exports = config;
