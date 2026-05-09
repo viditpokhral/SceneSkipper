@@ -6,7 +6,7 @@ import { Message, UserSettings, DEFAULT_SETTINGS, SkipTimestamp } from './types'
 
 // FIX: No trailing slash — fetch path already starts with '/timestamps' so
 // a trailing slash here produced '...3000//timestamps' (double slash → 404).
-const API_BASE = 'http://localhost:3000';
+const API_BASE = 'https://sceneskip-api.vercel.app';
 
 // How long a cached result stays valid before we re-hit the API.
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -48,6 +48,31 @@ function setCache(key: string, timestamps: SkipTimestamp[]): void {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const MOCK_TIMESTAMPS: Array<{ keyword: string; timestamps: SkipTimestamp[] }> = [
+  // {
+  //   keyword: "lucifer s1e1",
+  //   timestamps: [
+  //     // Opening Lux club scene — suggestive dancing
+  //     { id: "luc-s1e1-1", start_time: 45, end_time: 90, category: "sex_nudity" },
+  //     // Lucifer waking up with two women
+  //     { id: "luc-s1e1-2", start_time: 118, end_time: 145, category: "sex_nudity" },
+  //     // Delilah shooting — blood
+  //     { id: "luc-s1e1-3", start_time: 310, end_time: 328, category: "sex_nudity" },
+  //     // Drive-by aftermath — body on ground
+  //     { id: "luc-s1e1-4", start_time: 335, end_time: 350, category: "sex_nudity" },
+  //     // Lucifer shoots the shooter
+  //     { id: "luc-s1e1-5", start_time: 370, end_time: 385, category: "sex_nudity" },
+  //     // Rapper murder scene — body
+  //     { id: "luc-s1e1-6", start_time: 780, end_time: 800, category: "sex_nudity" },
+  //     // Chloe's movie flashback — partial nudity
+  //     { id: "luc-s1e1-7", start_time: 1050, end_time: 1075, category: "sex_nudity" },
+  //     // Torture / interrogation scene
+  //     { id: "luc-s1e1-8", start_time: 1620, end_time: 1645, category: "sex_nudity" },
+  //     // Shootout at the mansion
+  //     { id: "luc-s1e1-9", start_time: 2180, end_time: 2210, category: "sex_nudity" },
+  //     // Final confrontation — gun violence
+  //     { id: "luc-s1e1-10", start_time: 2290, end_time: 2315, category: "sex_nudity" },
+  //   ],
+  // },
   // ─── Game of Thrones — Season 1 ───────────────────────────────────────────
   {
     keyword: 'game of thrones s1e1',
@@ -251,7 +276,6 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.sync.get('settings', (result) => {
     if (!result.settings) {
       chrome.storage.sync.set({ settings: DEFAULT_SETTINGS }, () => {
-        console.log('[SceneSkip] Installed — default settings saved.');
       });
     }
   });
@@ -271,7 +295,6 @@ chrome.runtime.onMessage.addListener((message: Message, _sender, sendResponse) =
     // Return cached result immediately if still fresh
     const cached = getCached(cacheKey);
     if (cached) {
-      console.log(`[SceneSkip BG] "${title}" → ${cached.length} timestamps (cache)`);
       sendResponse({ timestamps: cached });
       return false; // synchronous response, no need to keep channel open
     }
@@ -279,15 +302,11 @@ chrome.runtime.onMessage.addListener((message: Message, _sender, sendResponse) =
     fetchFromApi(title)
       .then((timestamps) => {
         setCache(cacheKey, timestamps);
-        console.log(`[SceneSkip BG] "${title}" → ${timestamps.length} timestamps (API)`);
         sendResponse({ timestamps });
       })
       .catch((err) => {
-        console.warn('[SceneSkip BG] API failed, falling back to mock:', err.message);
         const timestamps = mockLookup(title);
-        // Cache mock results too so we don't re-hit the dead API on every tick
         setCache(cacheKey, timestamps);
-        console.log(`[SceneSkip BG] "${title}" → ${timestamps.length} timestamps (mock)`);
         sendResponse({ timestamps });
       });
 

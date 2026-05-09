@@ -399,46 +399,12 @@
     </label>
   </div>
 
-  <!-- Debug seek -->
-  <div class="hunt-card" style="background: var(--accent-2); margin-bottom: 0;">
-    <div class="hunt-title" style="color: var(--black);">DEBUG SEEK</div>
-    <div class="hunt-flex">
-      <input type="number" id="debug-time" placeholder="SECONDS (e.g. 120)" min="0"
-        style="background: var(--white); color: var(--black);" />
-      <button id="debug-seek" style="background: var(--white);">JUMP</button>
-    </div>
-    <div id="debug-status" style="color: var(--black); font-size: 10px; font-weight: bold; min-height: 15px;">
-      WAITING FOR INPUT...
-    </div>
-  </div>
-
-  <!-- Diagnose -->
-  <div class="hunt-card" style="background: #1a1a2e; margin-bottom: 0;">
-    <div class="hunt-title" style="color: #a29bfe;">DIAGNOSE</div>
-    <div class="hunt-flex" style="margin-bottom: 8px;">
-      <button id="btn-diagnose" style="width:100%; font-size:16px; padding: 6px 0;">
-        SCAN THIS PAGE
-      </button>
-    </div>
-    <div id="diagnose-output">Click SCAN THIS PAGE while watching a show...<span class="cursor"></span></div>
-  </div>
-
-  <!-- Hunt tool -->
-  <div class="hunt-card">
-    <div class="hunt-title">HUNT TOOL</div>
-    <div class="hunt-flex">
-      <input type="text" id="hunt-query" placeholder="S01E01..." />
-      <button id="btn-hunt">HUNT</button>
-    </div>
-    <div id="hunt-output">READY_FOR_INPUT...<span class="cursor"></span></div>
-  </div>
-
   <div class="footer">
     <div>SCENESKIP // V1.0.0</div>
     <div>PHASE 1</div>
   </div>
 
-  <script src="dist/popup.js"></script>
+  <script src="popup.js"></script>
 </body>
 
 </html>

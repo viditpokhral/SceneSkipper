@@ -149,9 +149,6 @@ function extractFromJson(json: any): boolean {
         interceptedEpisode = e;
         if (name && typeof name === 'string') interceptedShowName = name.trim();
 
-        console.log(
-          `[SceneSkip] Intercepted episode: show="${interceptedShowName}" S${s}E${e}`
-        );
         // Trigger a fresh title fetch with this new info
         lastCheckedTitle = '';
         ensureTimestampsFresh(true);
@@ -629,11 +626,8 @@ async function ensureTimestampsFresh(force = false) {
 
   isFetching = true;
   lastCheckedTitle = detected;
-  (window as any).__SCENESKIP_LAST_TITLE__ = detected;
 
   timestamps = await loadTimestamps(detected);
-  (window as any).__SCENESKIP_TIMESTAMP_COUNT__ = timestamps.length;
-  console.log(`[SceneSkip] title="${detected}" → ${timestamps.length} timestamps`);
 
   document.querySelectorAll('iframe').forEach((iframe) => {
     try { iframe.contentWindow?.postMessage({ type: 'SCENESKIP_TITLE', title: detected }, '*'); }

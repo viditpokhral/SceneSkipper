@@ -1,10 +1,14 @@
 {
   "name": "sceneskip-extension",
   "version": "1.0.0",
-  "description": "SceneSkip Chrome Extension — crowdsourced scene skipping for any video",
+  "description": "SceneSkip Extension — crowdsourced scene skipping for any video",
   "scripts": {
-    "build": "NODE_ENV=production webpack --mode production",
-    "dev": "NODE_ENV=development webpack --mode development --watch"
+    "build": "npm run build:chrome && npm run build:firefox",
+    "build:chrome": "NODE_ENV=production TARGET=chrome webpack --mode production",
+    "build:firefox": "NODE_ENV=production TARGET=firefox webpack --mode production",
+    "dev": "npm run dev:chrome",
+    "dev:chrome": "NODE_ENV=development TARGET=chrome webpack --mode development --watch",
+    "dev:firefox": "NODE_ENV=development TARGET=firefox webpack --mode development --watch"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.268",

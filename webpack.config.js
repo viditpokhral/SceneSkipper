@@ -1,6 +1,10 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 
+// Reads TARGET env var — defaults to 'chrome'.
+// Usage:  TARGET=firefox npm run build:firefox
+const TARGET = process.env.TARGET || 'chrome';
+
 /** @type {import('webpack').Configuration} */
 const config = {
   entry: {
@@ -10,7 +14,9 @@ const config = {
   },
 
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    // Each browser gets its own self-contained folder so you can load either
+    // as an unpacked extension without touching the other.
+    path: path.resolve(__dirname, `dist/${TARGET}`),
     filename: '[name].js',
     clean: true,
   },
@@ -41,7 +47,15 @@ const config = {
   plugins: [
     new CopyPlugin({
       patterns: [
+        // Copy the right manifest as manifest.json into the output folder
+        {
+          from: `manifest.${TARGET}.json`,
+          to: 'manifest.json',
+        },
+        // Static assets — same for both browsers
         { from: 'src/netflix-bridge.js', to: 'netflix-bridge.js' },
+        { from: 'popup.html', to: 'popup.html' },
+        { from: 'icons', to: 'icons' },
       ],
     }),
   ],
